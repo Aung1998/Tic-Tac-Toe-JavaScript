@@ -1,5 +1,5 @@
 const Player = (name, sign) => {
-    const moves = []
+    let moves = []
     
     function addMove(pos){
         moves.push(pos)
@@ -8,21 +8,29 @@ const Player = (name, sign) => {
     function getMoves(){
         return moves;
     }
+
+    function resetMoves(){
+        moves = []
+    }
+
     return {
         name: name,
         sign: sign,
         addMove: addMove,
-        getMoves: getMoves
+        getMoves: getMoves,
+        resetMoves: resetMoves
     }
 }
 
 const Game = (() =>{
     let board = ['', '', '', '', '', '', '', '', '']
-    
 
-
-    function fullBoard(){
-        return board.every(idx => idx != '')
+    function clearBoard(){
+        board = ['', '', '', '', '', '', '', '', '']
+        const board_DOM = Array.from(document.querySelectorAll('.box'))
+        board_DOM.forEach(box => {
+            box.textContent = "";
+        })
     }
 
     function addMove(player, pos, box){
@@ -42,15 +50,16 @@ const Game = (() =>{
     }
 
     function newGame(){
+        clearBoard()
         const board = Array.from(document.querySelectorAll('.box'))
         const player1_socre = document.querySelector('.play1score')
         const player2_score = document.querySelector('.play2score')
 
-        p1_score = 0
-        p2_score = 0
+        let p1_score = 0
+        let p2_score = 0
 
-        player1 = Player("Player 1", "X")
-        player2 = Player("Player 2", "O")
+        const player1 = Player("Player 1", "X")
+        const player2 = Player("Player 2", "O")
         player_turn = true;
         board.forEach(box => box.addEventListener('click', () => {
             pos = parseInt(box.dataset.index);
@@ -60,7 +69,7 @@ const Game = (() =>{
                     if (checkWin(player1.getMoves())){
                         alert(`${player1.name} has Won!`)
                         p1_score+=1;
-                        player1_socre.textContent = p1_score;
+                        player1_socre.textContent = `${p1_score}`;
                     }
                     player_turn = false;
                 }
@@ -70,19 +79,24 @@ const Game = (() =>{
                     if (checkWin(player2.getMoves())){
                         alert(`${player2.name} has Won!`)
                         p2_score+=1;
-                        player2_score.textContent = p1_score;
+                        player2_score.textContent = `${p2_score}`;
                     }
                     player_turn = true;
                     box.textContent = player2.sign
                 }
             }
-
         }))
+        document.querySelector('.clearbtn').addEventListener('click', ()=>{
+            clearBoard()
+            player1.resetMoves();
+            player2.resetMoves();
+        });
     }
 
 
     return{
-        newGame
+        newGame,
+        clearBoard
     }
 })();
 
